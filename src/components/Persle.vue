@@ -8,20 +8,20 @@
       <span class="subtitle">Guessing people's names</span>
     </h3>
 
-    <a class="top-button" href='#'>
-      <span class="material-icons">settings</span>
+    <a class="top-button" href='#' @click="help()">
+      <span class="material-icons">help</span>
     </a>
 
 
-    <a class="top-button" href='#'>
+    <a class="top-button" href='#' @click="chart()">
       <span class="material-icons">leaderboard</span>
     </a>
 
-    <a class="top-button" href='#'>
+    <a class="top-button" href='#' @click="pPlus()">
       P+
     </a>
 
-    <a class="top-button" href='#'>
+    <a class="top-button" href='#' @click="lose()">
       GU
     </a>
 
@@ -31,7 +31,7 @@
       </span>
     </div>
 
-    <br />
+    <div style="margin-top: 10px"></div>
 
     <div v-for="(row,i) in keyboard" :key="i+100" :class="{'disabled': disable}">
       <span v-for="(key,j) in row" :key="j+1000">
@@ -39,6 +39,7 @@
           href='#'
           class="key" :class="i===2 ? (j === 0 ? 'danger' : (j === 8 ? 'action' : null)) : null"
           @click="typeLetter(key)"
+          :id="'key-' + key"
         >{{key}}</a>
       </span>
     </div>
@@ -135,12 +136,23 @@ export default {
         document.getElementById(`G${this.iGuess}L${i}`).classList.add(css);
       }
 
+      this.updateKeyboard(result, word);
+
       if (result.every(x => x === 2)) {
         this.win();
         return fasle;
       }
 
       return true;
+    },
+
+    updateKeyboard: function(result, word) {
+
+      for(var i=0;i<result.length;i++) {
+        var css = result[i] === 0 ? 'no' : (result[i] === 1 ? 'nearly' : 'yes');
+
+        document.getElementById(`key-${word[i]}`).classList.add(css);
+      }
     },
 
     clearMsg: function() {
@@ -167,6 +179,18 @@ export default {
       this.msgColour = "warn";
       this.disable = true;
     },
+
+    pPlus: function() {
+      alert('What does this even do?');
+    },
+
+    help: function() {
+      alert("Guess a person's name by typing on the keyboard. Green = right place, Yellow = wrong place, Grey = not in word.")
+    },
+    
+    chart: function() {
+      alert("Hello from Flynn.")
+    },
   }
 
 }
@@ -175,7 +199,7 @@ export default {
 <style scoped>
 h3 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 h3 span.material-icons {
   vertical-align: bottom;
@@ -249,12 +273,22 @@ h3 span.subtitle {
   background: #fca5a5;
 }
 
+.key.no {
+  background: #e2e8f0;
+}
+.key.nearly {
+  background: #fde68a;
+}
+.key.yes {
+  background: #bbf7d0 !important;
+}
+
 .msg {
   color: #9ca3af;
   font-size: 20px;
   font-weight: bold;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .warn {

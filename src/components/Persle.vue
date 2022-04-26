@@ -451,6 +451,7 @@ h3 span.subtitle {
   font-size: 24px;
   margin-top: 30px;
   display: inline-block;
+  cursor: pointer;
 }
 
 .share-button > span {

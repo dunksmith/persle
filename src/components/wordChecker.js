@@ -4,7 +4,7 @@ var checkWord = function (word) {
   var match = getName();
 
   if (word === "CHEAT") alert(match);
-  if (word === "FLYNN") alert("Happy easter!!");
+  if (word === "FLYNN") alert("That's my name don't wear it out!");
 
   if (names.every(x => x.name !== word)) return null;
 

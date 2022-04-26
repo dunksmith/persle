@@ -5,7 +5,7 @@
       <span class="material-icons">face</span>
       PERSLE
       &nbsp; &nbsp;
-      <span class="subtitle">Guessing people's names</span>
+      <span class="subtitle">Guess people's names</span>
     </h3>
 
     <a class="top-button" href='#' @click="help()">
@@ -302,6 +302,20 @@ h3 span.subtitle {
 @keyframes flash {
   from {background-color: #999999;}
   to {background-color: transparent;}
+}
+
+/* iPhone 5/SE */
+@media screen and (max-width: 666px) {
+    
+  .letter {
+    height: 38px;
+    width: 38px;
+  }
+
+  .key {
+    width:17px;
+    margin: 2px 2px;
+  }
 }
 
 </style>

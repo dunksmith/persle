@@ -101,6 +101,7 @@ export default {
       givingUp: false,
       finished: false,
       won: false,
+      refreshStatistics: false,
 
       dialog: {
         show: false,
@@ -111,6 +112,9 @@ export default {
   },
   computed: {
     totalPlays: function () {
+      // Recomputed when this changes
+      this.refreshStatistics;
+
       return parseInt(localStorage.getItem("persle_plays")) || 0;
     }
   },
@@ -252,6 +256,7 @@ export default {
       if (day > lastPlayed) {
         var plays = parseInt(localStorage.getItem("persle_plays")) || 0;
         localStorage.setItem("persle_plays", plays + 1);
+        this.refreshStatistics = !this.refreshStatistics;
       }
 
       setTimeout(() => {

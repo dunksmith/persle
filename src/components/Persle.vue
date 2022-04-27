@@ -8,18 +8,29 @@
       <span class="subtitle">Guess people's names</span>
     </h3>
 
-    <a class="top-button" href='#' @click="help()">
-      <span class="material-icons">help</span>
-    </a>
+    <div v-if="!givingUp">
+      <a class="top-button" href='#' @click="help()" title="Help">
+        <span class="material-icons">help</span>
+      </a>
 
+      <a class="top-button" href='#' @click="chart()" title="Statistics">
+        <span class="material-icons">leaderboard</span>
+      </a>
 
-    <a class="top-button" href='#' @click="chart()">
-      <span class="material-icons">leaderboard</span>
-    </a>
+      <a class="top-button" href='#' @click="boyOrGirl()" title="Boy or girl?">
+        <span class="material-icons">wc</span>
+      </a>
 
-    <a class="top-button" href='#' @click="lose()">
-      GU
-    </a>
+      <a class="top-button" href='#' @click="givingUp=true" :class="{ disabled: finished }" title="Give up?">
+        GU
+      </a>
+    </div>
+
+    <div v-if="givingUp" class="giving-up">
+      Give up?
+      <a class="top-button" href='#' @click="lose()">Y</a>
+      <a class="top-button" href='#' @click="givingUp=false">N</a>
+    </div>
 
     <div v-for="(guess,i) in guesses" :key="i">
       <span v-for="(letter,j) in guess" :key="j+10">
@@ -29,10 +40,9 @@
 
     <div style="margin-top: 10px"></div>
 
-    <div v-for="(row,i) in keyboard" :key="i+100" :class="{'disabled': disable}">
+    <div v-for="(row,i) in keyboard" :key="i+100" :class="{'disabled': finished}">
       <span v-for="(key,j) in row" :key="j+1000">
         <a
-          href='#'
           class="key" :class="i===2 ? (j === 0 ? 'danger' : (j === 8 ? 'action' : null)) : null"
           @click="typeLetter(key)"
           :id="'key-' + key"
@@ -59,7 +69,7 @@
           </tr>
         </table>
 
-        <div v-if="won">
+        <div v-if="finished && iGuess > 0">
           <a class="share-button" @click="share()">
             <span class="material-icons">share</span>
             Share
@@ -75,7 +85,6 @@
 
 <script>
 import wordChecker from './wordChecker';
-import workChecker from "./wordChecker";
 
 export default {
   data () {
@@ -89,7 +98,8 @@ export default {
       iLetter: 0,
       msg: null,
       msgColour: null,
-      disable: false,
+      givingUp: false,
+      finished: false,
       won: false,
 
       dialog: {
@@ -122,6 +132,7 @@ export default {
     typeLetter: function(key) {
 
       this.clearMsg();
+      this.givingUp = false;
 
       if (key === "←") {
         if (this.iLetter === 0) return;
@@ -156,7 +167,12 @@ export default {
     checkWord: function() {
       var word = this.guesses[this.iGuess].join("");
 
-      var result = workChecker.checkWord(word);
+      if (word === "FLYNN") {  
+        this.msg = "Hello 😊";
+        this.msgColour = "success";
+      }
+
+      var result = wordChecker.checkWord(word);
 
       if (!result) {
         var msgs = ["UK baby names only", "Not a popular baby name", "Sorry I don't know that one"];
@@ -211,8 +227,21 @@ export default {
     win: function() {
       this.msg = "Well done!";
       this.msgColour = "success";
-      this.disable = true;
       this.won = true;
+
+      this.finish();
+    },
+
+    lose: function() {
+      this.msg = "Bad luck! It was " + wordChecker.getName();
+      this.msgColour = "warn";
+
+      this.finish();
+    },
+
+    finish: function() {
+      this.finished = true;
+      this.givingUp = false;
 
       var lastPlayed = parseInt(localStorage.getItem("persle_lastDayPlayed")) || 0;
       
@@ -227,13 +256,7 @@ export default {
 
       setTimeout(() => {
         this.showDialog();
-      }, 1000);
-    },
-
-    lose: function() {
-      this.msg = "Bad luck! It was " + wordChecker.getName();
-      this.msgColour = "warn";
-      this.disable = true;
+      }, 800);
     },
 
     getDayOfPlay: function() {
@@ -245,20 +268,20 @@ export default {
     showDialog: function() {
       this.dialog.show = true;
 
-      // 🤯🤩😎😊😜🙂
-      var faces = ['\u{1F92F}','\u{1F929}','\u{1F60E}','\u{1F60A}','\u{1F61C}','\u{1F642}']
-      
-      //⬜🟨🟩
-      var results = ['\u{2B1C}','\u{1F7E8}','\u{1F7E9}']
+      var faces = ["🤯","🤩","😎","😊","😜","🙂"];
+      var results =["⬜","🟨","🟩"];
 
       var day = this.getDayOfPlay();
 
-      var shareText = "persle.com "
-        + day + " "
-        + (this.iGuess+1) + "/6 "
-        + faces[this.iGuess];
+      var shareText = "persle.com ";
+      shareText += day + " ";
+      shareText += this.won ? (this.iGuess+1) + "/6 " : "";
+      shareText += this.won ? faces[this.iGuess] : "🙁";
 
       for(var i=0; i<this.iGuess+1; i++) {
+        if ((i + 1) > this.matches.length)
+          break;
+
         shareText += `
 `;
         for(var j=0; j<this.numOfLetters; j++) {
@@ -272,11 +295,18 @@ export default {
     },
 
     help: function() {
-      alert("Guess today's name by typing on the keyboard. Green = right place, Yellow = wrong place, Grey = not in word.")
+      alert(`Guess today's name by typing on the keyboard. Green = right place, Yellow = wrong place, Grey = not in word."
+
+Flynn 2022`)
     },
     
     chart: function() {
       this.dialog.show = true;
+    },
+
+    boyOrGirl: function() {
+      var sex = wordChecker.boyOrGirl();
+      alert("It's a " + (sex === "b" ? "boy!" : "girl!"));
     },
 
     share: function() {    
@@ -300,6 +330,11 @@ h3 span.material-icons {
 h3 span.subtitle {
   font-size: 80%;
   color: #999999;
+}
+
+a.disabled {
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 .letter {
@@ -341,6 +376,11 @@ h3 span.subtitle {
   font-size: 20px;
 }
 
+.giving-up {
+  font-size: 22px;
+  color: #999999;
+}
+
 .disabled {
   opacity: 0.6;
   pointer-events: none;
@@ -353,6 +393,7 @@ h3 span.subtitle {
   margin: 3px 3px;
   width:20px;
   display: inline-block;
+  cursor: pointer;
 }
 .key:active {
   animation-name: flash;

@@ -4,7 +4,6 @@ var checkWord = function (word) {
   var match = getName();
 
   if (word === "CHEAT") alert(match);
-  if (word === "FLYNN") alert("That's my name don't wear it out!");
 
   if (names.every(x => x.name !== word)) return null;
 
@@ -38,11 +37,22 @@ var checkWord = function (word) {
 };
 
 var getName = function() {
-    // Days from day 0
-    var ms = new Date() - new Date("2022-04-08T00:00");
-    var day = Math.floor(ms / 1000 / 60 / 60 / 24);
-  
-    return names[day].name;  
+  var day = getDay();
+
+  return names[day].name;  
+};
+
+var boyOrGirl = function() {
+  var day = getDay();
+
+  return names[day].sex;  
+};
+
+// Days from day 0
+var getDay = function() {
+  var ms = new Date() - new Date("2022-04-08T00:00");
+  var day = Math.floor(ms / 1000 / 60 / 60 / 24);
+  return day;
 };
 
 // Generate from Excel
@@ -2080,4 +2090,5 @@ var names = [
 export default {
   checkWord: checkWord,
   getName: getName,
+  boyOrGirl: boyOrGirl,
 }
